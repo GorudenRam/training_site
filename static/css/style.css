@@ -1,0 +1,36 @@
+.courses {
+    padding: 0px;
+}
+
+.course {
+    padding-top: 15px;
+}
+
+.course__wrapper {
+    text-decoration: none;
+    color: #000;
+    text-align: center;
+}
+
+.course__wrapper:hover {
+    text-decoration: none;
+    color: #000;
+    text-align: center;
+}
+
+.course__img {
+    padding-bottom: 10px;
+    max-width: 100%;
+}
+
+.course__title {
+    padding: 0px;
+}
+
+.course__content {
+    padding: 0px;
+}
+
+.course__author {
+    padding: 0px;
+}
