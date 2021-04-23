@@ -4,26 +4,12 @@
     <div id="courseData">
     </div>
     <script>
-                  let str = ("{{html}}").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g, '"').replace(/=/g, "=");
+                  let str = (`{{html}}`).replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g, '"').replace(/=/g, "=");
                   document.getElementById("courseData").innerHTML = str;
     </script>
-    {{ if chapter.is_test}}
-    {{ }}
-    <script>
-
-    var testCheck = function () {
-    let fields = document.getElementsByClassName("field");
-    fields.foreach(field=>{
-    value=field.get('value')
-    id=field.get('id')
-
-    if(answers[id]==value) {
-
-    }
-    })
-
-};
-                  let str = ("{{html}}").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g, '"').replace(/=/g, "=");
-                  document.getElementById("courseData").innerHTML = str;
-    </script>
+    {% if chapter.is_test %}
+        <a class="btn btn-primary" href="test/">
+       Начать тест
+        </a>
+    {% endif %}
 {% endblock %}

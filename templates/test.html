@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <script>
+    var testCheck = function() {
+        let allElem = document.getElementsByClassName("question__answer");
+        let strJSON = ('{{test}}').replace(/&#39;/g,'"');
+        let testJSON = JSON.parse(strJSON)
+        let allTrueAnswer = {};
+        testJSON.forEach(item => {
+            let id = item.id;
+            let answer = item.answer;
+            allTrueAnswer[id] = answer;
+        });
+        let allAnswer = {};
+        let allCheck = {};
+        let countErrors = 0;
+        Array.from(allElem).forEach(el => {
+            allCheck[el.name] = true;
+        })
+        Array.from(allElem).forEach(el => {
+            if(el.type=='checkbox') {
+                if (!allAnswer[el.name]) allAnswer[el.name] = [];
+                let elvalue = el.value;
+                let elchecked = el.checked;
+                allAnswer[el.name].push({elvalue, elchecked});
+
+                if (((allTrueAnswer[el.name][elvalue] && !el.checked) || (!allTrueAnswer[el.name][elvalue] && el.checked)) && allCheck[el.name]) {
+                     allCheck[el.name] = false;
+                     countErrors++;
+                }
+            }
+            else if(el.type=='radio') {
+                if(el.checked) allAnswer[el.name] = el.value;
+                if((allTrueAnswer[el.name] != el.value && el.checked) || (allTrueAnswer[el.name] == el.value && !el.checked)) {
+                     allCheck[el.name] = false;
+                     countErrors++;
+                }
+            }
+            else {
+                allAnswer[el.name] = el.value;
+                 if(allTrueAnswer[el.name] !== el.value) {
+                    allCheck[el.name] = false;
+                    countErrors++;
+                 }
+            }
+        });
+        if (countErrors) {
+            document.getElementById("countErrors").innerHTML = 'Количество ошибок: ' + countErrors;
+        }
+        else document.getElementById("countErrors").innerHTML = 'Все верно';
+        console.log(allCheck);
+    }
+    </script>
+    {% for question in test %}
+        <div class="row">
+            <div class="col-md-12 question">
+                <form>
+                <div class="question__text">
+                    Вопрос №{{question.id}}: {{ question.text }}?
+                </div>
+                {% if question.type == "input" %}
+                <div class="form-group">
+                    <input class="question__answer form-control" name={{question.id}} value="">
+                </div>
+                 {% elif question.type == "checkbox" %}
+                    {% for item in question.elements %}
+                    <div class="form-check">
+                        <input class="question__answer form-check-input" type="checkbox" name={{question.id}} value={{item.id}}>
+                        <label class="form-check-label">{{item.text}}</label>
+                    </div>
+                    {% endfor %}
+                {% elif question.type == "radio" %}
+                    {% for item in question.elements %}
+                    <div class="form-check">
+                    <input class="question__answer form-check-input" type="radio" name={{question.id}} value={{item.id}}>
+                    <label class="form-check-label">{{item.text}}</label>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+                </form>
+            </div>
+        </div>
+    {% endfor %}
+        <div>
+            <button onClick="testCheck()" class="btn btn-primary">Завершить тест</button>
+        </div>
+
+        <div id="countErrors">
+        </div>
+
+{% endblock %}

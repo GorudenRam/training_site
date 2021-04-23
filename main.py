@@ -7,6 +7,7 @@ from data.courses import Course
 from data.chapters import Chapter
 from flask_login import LoginManager, login_required, login_user
 from flask_login import logout_user, current_user
+import json
 
 
 app = Flask(__name__)
@@ -18,6 +19,29 @@ login_manager.init_app(app)
 
 def main():
     db_session.global_init("db/blogs.db")
+    k = "    [\
+        {   'id': '0',\
+            'text': '2+2',\
+            'type': 'input',\
+            'answer': '4'\
+        },\
+        {\
+            'id': '1',\
+            'text': 'Выбирите планеты',\
+            'type': 'checkbox',\
+            'answer': [1, 1, 0],\
+            'elements': [{'text': 'Юпитер', 'id': '0'}, {'text': 'Земля', 'id': '1'}, {'text': 'Солнце', 'id': '2'}]\
+        },\
+        {\
+            'id': '2',\
+            'text': '3 + 5',\
+            'type': 'radio',\
+            'answer': 0,\
+            'elements': [{'text': '8', 'id': '0'}, {'text': '7', 'id': '1'}]\
+        }\
+    ]"
+    k = k.replace("'", '"')
+    print(k)
     app.run()
 
 
@@ -40,26 +64,33 @@ def index():
 
 @app.route("/user/<id>")
 def user(id):
-    db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.id == id)[0]
-    user_courses = db_sess.query(Course).filter(Course.id.in_(user.last_chapters_json))
-    return render_template("user.html", user=user,
-                           user_courses=user_courses)
+    try:
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == id)[0]
+        user_courses = db_sess.query(Course).filter(Course.id.in_(user.last_chapters_json))
+        return render_template("user.html", user=user,
+                               user_courses=user_courses)
+    except Exception:
+        return render_template('error.html')
 
 
-@app.route("/course/<course_id>/<chapter_id>")
+@app.route("/course/<course_id>/<chapter_id>/")
 def course(course_id, chapter_id):
-    db_sess = db_session.create_session()
-    chapter = db_sess.query(Chapter).filter(Chapter.num == chapter_id, Chapter.course_id == course_id)[0]
-    html = chapter.html
-    return render_template("course.html", chapter=chapter, html=html)
+    try:
+        db_sess = db_session.create_session()
+        chapter = db_sess.query(Chapter).filter(Chapter.num == chapter_id, Chapter.course_id == course_id)[0]
+        html = chapter.html
+        return render_template("course.html", chapter=chapter, html=html)
+    except Exception:
+        return render_template("error.html")
 
 
-@app.route("/course/<course_id>/<chapter_id>/test")
+@app.route("/course/<course_id>/<chapter_id>/test/", methods=['GET', 'POST'])
 def test(course_id, chapter_id):
     db_sess = db_session.create_session()
-    test = db_sess.query(Chapter).filter(Chapter.num == chapter_id, Chapter.course_id == course_id)[0].test_json
-    return render_template("course.html", test=test, course_id=course_id, chapter_id=chapter_id)
+    test = json.loads(db_sess.query(Chapter).filter(Chapter.num == chapter_id, Chapter.course_id == course_id)[0].test_json)
+
+    return render_template("test.html", test=test, course_id=course_id, chapter_id=chapter_id)
 
 
 @app.route('/register', methods=['GET', 'POST'])

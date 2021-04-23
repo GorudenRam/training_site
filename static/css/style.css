@@ -34,3 +34,17 @@
 .course__author {
     padding: 0px;
 }
+
+.question {
+    padding-bottom:10px;
+    padding-top:10px;
+}
+
+.question__text {
+    font-size:16px;
+    padding-bottom:5px;
+}
+
+.question__answer {
+    font-size:16px;
+}
